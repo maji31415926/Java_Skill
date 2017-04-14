@@ -1,0 +1,78 @@
+//base抽取
+
+创建basedao接口
+
+/**
+ *定义了一个类型T，代表任意类型;
+ * (1)任意类型使用大写字母表示，不一定是T
+ * @author KCN
+ * 
+ * @param <T>
+ */
+public interface BaseDao<T> {
+
+    //添加
+    void add(T t);
+
+    //修改
+    void update(T t);
+
+    //删除
+    void delete(T t);
+
+    //根据id查询
+    T findOne(int id);
+
+    //查询所有
+    List<T> findAll();
+}
+
+//创建basedao接口的实现类，实现crud操作
+@SuppressWarnings("all")
+public class BaseDaoImpl<T> extends HibernateDaoSupport implements BaseDao<T> {
+
+    private Class pClass;
+    //构造方法,得到类
+    public BaseDaoImpl() {
+        //1 得到当前运行类Class
+        Class clazz = this.getClass();
+
+        //2 得到当前运行累的父类的参数化类型 BaseDaoImpl<T>
+        Type type = clazz.getGenericSuperclass();
+        //使用Type子接口强转
+        ParameterizedType ptype = (ParameterizedType) type;
+
+        //3 得到实际类型参数 <T>里面的T的具体类名
+        Type[] types = ptype.getActualTypeArguments();
+        //Type接口的实现类是Class
+        Class tclass = (Class) types[0];
+        this.pClass = tclass;
+    }
+
+    //添加
+    public void add(T t) {
+        this.getHibernateTemplate().save(t);
+    }
+
+    //修改
+    public void update(T t) {
+        this.getHibernateTemplate().update(t);
+    }
+
+    //删除
+    public void delete(T t) {
+        this.getHibernateTemplate().delete(t);
+    }
+
+    //根据id查询
+    public T findOne(int id) {
+        return (T) this.getHibernateTemplate().get(pClass, id);
+    }
+
+    //查询所有
+    public List<T> findAll() {
+        //使用Class里面的getSimpleName()得到类名
+        return (List<T>) this.getHibernateTemplate().find("from "+pClass.getSimpleName());
+    }
+
+}
