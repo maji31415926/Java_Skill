@@ -1,4 +1,4 @@
-//base抽取
+
 
 创建basedao接口
 
@@ -28,6 +28,7 @@ public interface BaseDao<T> {
 }
 
 //创建basedao接口的实现类，实现crud操作
+
 @SuppressWarnings("all")
 public class BaseDaoImpl<T> extends HibernateDaoSupport implements BaseDao<T> {
 
